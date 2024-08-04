@@ -1,38 +1,37 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const adPopup = document.getElementById('ad-popup');
-    const closeAdBtn = document.getElementById('close-ad');
+// script.js
 
-    // Display ad popup after 3 seconds
-    setTimeout(() => {
-        adPopup.style.display = 'block';
-    }, 3000);
+document.addEventListener('DOMContentLoaded', () => {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-    // Close ad popup
-    closeAdBtn.addEventListener('click', () => {
-        adPopup.style.display = 'none';
-    });
+    const updateCart = () => {
+        localStorage.setItem('cart', JSON.stringify(cart));
+        console.log('Cart updated:', cart);
+    };
 
-    // Add to Cart functionality
-    const addToCartButtons = document.querySelectorAll('.add-to-cart');
-    addToCartButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const productCard = button.closest('.product-card');
-            const productId = productCard.getAttribute('data-id');
-            const productName = productCard.getAttribute('data-name');
-            const productPrice = parseFloat(productCard.getAttribute('data-price'));
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const productCard = e.target.closest('.product-card');
+            const name = productCard.dataset.name;
+            const price = parseFloat(productCard.dataset.price);
+            const product = { name, price };
 
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            cart.push({ id: productId, name: productName, price: productPrice });
-            localStorage.setItem('cart', JSON.stringify(cart));
-
-            updateCartCount();
+            cart.push(product);
+            updateCart();
         });
     });
 
-    function updateCartCount() {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        document.getElementById('cart-count').textContent = cart.length;
-    }
+    const searchProducts = () => {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const products = document.querySelectorAll('.product-card');
+        products.forEach(product => {
+            const name = product.dataset.name.toLowerCase();
+            if (name.includes(query)) {
+                product.style.display = 'block';
+            } else {
+                product.style.display = 'none';
+            }
+        });
+    };
 
-    updateCartCount();
+    window.searchProducts = searchProducts;
 });
