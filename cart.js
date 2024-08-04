@@ -1,32 +1,40 @@
+// cartScript.js
+
 document.addEventListener('DOMContentLoaded', () => {
-    const cartItems = document.getElementById('cart-items');
-    const cartTotal = document.getElementById('cart-total');
-    const checkoutButton = document.getElementById('checkout');
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-    // Load cart from local storage
-    function loadCart() {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        cartItems.innerHTML = '';
+    const updateCartDisplay = () => {
+        const cartItemsContainer = document.getElementById('cartItems');
+        cartItemsContainer.innerHTML = '';
         let total = 0;
+
         cart.forEach(item => {
-            const cartItem = document.createElement('div');
-            cartItem.classList.add('cart-item');
-            cartItem.innerHTML = `
-                <h4>${item.product}</h4>
-                <p>Price: $${item.price}</p>
-            `;
-            cartItems.appendChild(cartItem);
-            total += parseFloat(item.price);
+            const itemElement = document.createElement('div');
+            itemElement.className = 'cart-item';
+            itemElement.innerHTML = `<span>${item.name}</span><span>$${item.price.toFixed(2)}</span>`;
+            cartItemsContainer.appendChild(itemElement);
+            total += item.price;
         });
-        cartTotal.innerHTML = `<h3>Total: $${total.toFixed(2)}</h3>`;
-        document.getElementById('cart-count').textContent = cart.length;
-    }
 
-    // Handle checkout
-    checkoutButton.addEventListener('click', () => {
-        window.location.href = 'https://www.paypal.com';
-    });
+        const totalElement = document.createElement('div');
+        totalElement.className = 'cart-total';
+        totalElement.innerHTML = `<strong>Total:</strong> $${total.toFixed(2)}`;
+        cartItemsContainer.appendChild(totalElement);
+    };
 
-    // Initial load
-    loadCart();
+    const checkout = () => {
+        alert('Redirecting to PayPal...');
+        // Implement PayPal checkout process here
+    };
+
+    const cancel = () => {
+        localStorage.removeItem('cart');
+        alert('Cart has been cleared.');
+        window.location.reload();
+    };
+
+    document.getElementById('checkoutButton').addEventListener('click', checkout);
+    document.getElementById('cancelButton').addEventListener('click', cancel);
+
+    updateCartDisplay();
 });
